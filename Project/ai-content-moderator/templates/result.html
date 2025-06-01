@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Moderation Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Moderation Results</h1>
+
+        {# Display general errors from Flask if any #}
+        {% if errors %}
+            <div class="error-message">
+                <h2>General Errors</h2>
+                {% for error in errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if text_result %}
+        <div class="section">
+            <h2>Text Moderation</h2>
+            {% if text_result.error %}
+                <p class="toxic"><strong>Error:</strong> {{ text_result.error }}</p>
+                <p>Could not fully moderate text due to an error.</p>
+            {% else %}
+                <p><strong>Original Text:</strong> {{ text_result.original_text }}</p>
+                <p><strong>Processed Text:</strong> {{ text_result.processed_text }}</p>
+                <p><strong>Detected Language:</strong> {{ text_result.language }}</p>
+                <p><strong>Toxicity Label:</strong> {{ text_result.label }}</p>
+                <p><strong>Confidence Score:</strong> {{ text_result.score }}</p>
+                {% if text_result.safe %}
+                    <p class="safe">✅ This text is safe.</p>
+                {% else %}
+                    <p class="toxic">⚠️ This text is toxic.</p>
+                {% endif %}
+                {# DEBUGGING: Display raw classifier output if available #}
+                {% if text_result.raw_response %}
+                    <p><strong>Raw Classifier Output:</strong> <pre>{{ text_result.raw_response | tojson }}</pre></p>
+                {% else %}
+                    <p><em>(Raw text classifier response not available. Ensure `text_moderator.py` captures it.)</em></p>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if image_result %}
+        <div class="section">
+            <h2>Image Moderation</h2>
+            {% if image_result.error %}
+                <p class="toxic"><strong>Error:</strong> {{ image_result.error }}</p>
+                <p>Could not fully moderate image due to an error.</p>
+            {% endif %}
+            
+            {% if image_result.filename %}
+                <img src="{{ url_for('static', filename=image_result.filename) }}" alt="Uploaded Image" width="300">
+            {% else %}
+                <p>No image uploaded or image path not available.</p>
+            {% endif %}
+            
+            <p><strong>Moderation Result:</strong> {{ image_result.label }}</p>
+            {% if image_result.safe %}
+                <p class="safe">✅ This image is safe.</p>
+            {% else %}
+                <p class="toxic">⚠️ This image is inappropriate.</p>
+            {% endif %}
+            {# DEBUGGING: Display raw API response if available #}
+            {% if image_result.raw_response %}
+                <p><strong>Raw API Response (Sightengine):</strong> <pre>{{ image_result.raw_response | tojson }}</pre></p>
+            {% else %}
+                <p><em>(Raw image API response not available.)</em></p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="back-link">
+            <a href="{{ url_for('index') }}">🔙 Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

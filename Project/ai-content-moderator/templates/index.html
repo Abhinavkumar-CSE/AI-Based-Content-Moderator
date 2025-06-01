@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Content Moderator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>AI Content Moderator</h1>
+    <p>Check if your text or image contains harmful or inappropriate content.</p>
+
+    {# Display errors from Flask if any #}
+    {% if errors %}
+        <div class="error-message">
+            {% for error in errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form action="/moderate" method="POST" enctype="multipart/form-data">
+      <label for="user_text">Enter Text:</label>
+      <textarea name="user_text" id="user_text" rows="5" placeholder="Type something..."></textarea>
+
+      <label for="image">Upload Image:</label>
+      <input type="file" name="image" accept="image/*">
+
+      <button type="submit">Moderate Content</button>
+    </form>
+  </div>
+</body>
+</html>
